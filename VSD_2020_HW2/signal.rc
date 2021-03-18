@@ -1,0 +1,160 @@
+Magic 271485
+Revision Verdi_N-2017.12
+
+; Window Layout <x> <y> <width> <height> <signalwidth> <valuewidth>
+viewPort 0 23 1920 1017 242 148
+
+; File list:
+; openDirFile [-d delimiter] [-s time_offset] [-rf auto_bus_rule_file] path_name file_name
+openDirFile -d / "" "/home/user2/ms108/alien108/alien/VSD/VSD_2020_HW2/N27081095/build/top.fsdb"
+
+; file time scale:
+; fileTimeScale ### s|ms|us|ns|ps
+
+; signal spacing:
+signalSpacing 5
+
+; windowTimeUnit is used for zoom, cursor & marker
+; waveform viewport range
+zoom 0.000000 69927.642887
+cursor 65500.000000
+marker 0.000000
+
+; user define markers
+; userMarker time_pos marker_name color linestyle
+; visible top row signal index
+top 0
+; marker line index
+markerPos 77
+
+; event list
+; addEvent event_name event_expression
+; curEvent event_name
+
+
+
+COMPLEX_EVENT_BEGIN
+
+
+COMPLEX_EVENT_END
+
+
+
+; toolbar current search type
+; curSTATUS search_type
+curSTATUS ByChange
+
+
+addGroup "G1"
+activeDirFile "" "/home/user2/ms108/alien108/alien/VSD/VSD_2020_HW2/N27081095/build/top.fsdb"
+addSignal -h 15 /top_tb/TOP/clk
+addSignal -h 15 -holdScope rst
+addGroup "A"
+addSignal -h 15 -UNSIGNED -HEX /top_tb/TOP/i_CPU_wrapper/i_CPU/DP/A.IF_PC[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope A.IF_Instr[31:0]
+addGroup "B" -e FALSE
+addSignal -h 15 /top_tb/TOP/i_CPU_wrapper/i_CPU/DP/B.ALUSrc
+addSignal -h 15 -holdScope B.MemToReg
+addSignal -h 15 -holdScope B.Branch
+addSignal -h 15 -holdScope B.MemWrite
+addSignal -h 15 -holdScope B.MemRead
+addSignal -h 15 -UNSIGNED -HEX -holdScope B.ALUOp[1:0]
+addSignal -h 15 -holdScope B.RegWrite
+addSignal -h 15 -holdScope B.JalrSel
+addSignal -h 15 -UNSIGNED -HEX -holdScope B.RWSel[1:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope B.Instr[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope B.RS1[4:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope B.RS2[4:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope B.RD1[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope B.RD2[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope B.rd[4:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope B.Func3[2:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope B.Func7[6:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope B.PC[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope B.ImmG[31:0]
+addGroup "C" -e FALSE
+addSignal -h 15 /top_tb/TOP/i_CPU_wrapper/i_CPU/DP/C.MemToReg
+addSignal -h 15 -holdScope C.MemWrite
+addSignal -h 15 -holdScope C.MemRead
+addSignal -h 15 -holdScope C.RegWrite
+addSignal -h 15 -UNSIGNED -HEX -holdScope C.RWSel[1:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope C.PC[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope C.Instr[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope C.rd[4:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope C.Func3[2:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope C.PC_Imm[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope C.PC_4[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope C.ImmG[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope C.AluResult[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope C.Mem_WData[31:0]
+addGroup "D" -e FALSE
+addSignal -h 15 /top_tb/TOP/i_CPU_wrapper/i_CPU/DP/D.MemRead
+addSignal -h 15 -holdScope D.MemToReg
+addSignal -h 15 -holdScope D.RegWrite
+addSignal -h 15 -UNSIGNED -HEX -holdScope D.RWSel[1:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope D.PC[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope D.Instr[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope D.rd[4:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope D.Func3[2:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope D.PC_Imm[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope D.PC_4[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope D.ImmG[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope D.AluResult[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope D.MemRData[31:0]
+addGroup "G7"
+addSignal -h 15 /top_tb/TOP/i_CPU_wrapper/i_CPU/DP/start
+addSignal -h 15 -UNSIGNED -HEX /top_tb/TOP/i_CPU_wrapper/i_CPU/IM_Adrs[31:0]
+addSignal -h 15 -UNSIGNED -HEX /top_tb/TOP/i_CPU_wrapper/IM_A[31:0]
+addGroup "G8"
+addSignal -h 15 /top_tb/TOP/i_CPU_wrapper/i_CPU/DP/Stall
+addSignal -h 15 -holdScope IM_Stall
+addSignal -h 15 -UNSIGNED -HEX -holdScope CurPC[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope NextPC[31:0]
+addGroup "master0"
+addSignal -h 15 /top_tb/TOP/i_CPU_wrapper/master0/ARVALID
+addSignal -h 15 -holdScope ARREADY
+addSignal -h 15 -UNSIGNED -HEX -holdScope ARADDR[31:0]
+addSignal -h 15 -holdScope OE
+addSignal -h 15 -holdScope RVALID
+addSignal -h 15 -holdScope RREADY
+addSignal -h 15 -UNSIGNED -HEX -holdScope RDATA[31:0]
+addGroup "IM"
+addSignal -h 15 /top_tb/TOP/IM1/OE
+addSignal -h 15 -UNSIGNED -HEX -holdScope A[13:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope DO[31:0]
+addGroup "G10"
+addSignal -h 15 -UNSIGNED -HEX /top_tb/TOP/IM1/i_SRAM/DO[31:0]
+addGroup "G11"
+
+; getSignalForm Scope Hierarchy Status
+; active file of getSignalForm
+activeDirFile "" "/home/user2/ms108/alien108/alien/VSD/VSD_2020_HW2/N27081095/build/top.fsdb"
+
+GETSIGNALFORM_SCOPE_HIERARCHY_BEGIN
+getSignalForm close
+
+"/top_tb"
+"/top_tb/TOP"
+"/top_tb/TOP/IM1"
+"/top_tb/TOP/IM1/i_SRAM"
+"/top_tb/TOP/i_CPU_wrapper"
+"/top_tb/TOP/i_CPU_wrapper/i_CPU"
+"/top_tb/TOP/i_CPU_wrapper/i_CPU/DP"
+"/top_tb/TOP/i_CPU_wrapper/master0"
+
+SCOPE_LIST_BEGIN
+"/top_tb"
+"/top_tb/TOP"
+"/top_tb/TOP/i_CPU_wrapper"
+"/top_tb/TOP/DM1"
+"/top_tb/TOP/i_CPU_wrapper/master0"
+"/top_tb/TOP/i_CPU_wrapper/i_CPU"
+"/top_tb/TOP/i_CPU_wrapper/i_CPU/DP"
+"/top_tb/TOP/IM1"
+"/top_tb/TOP/IM1/i_SRAM"
+"/top_tb/TOP/i_CPU_wrapper/i_CPU/DP/ImmUnit"
+SCOPE_LIST_END
+
+GETSIGNALFORM_SCOPE_HIERARCHY_END
+
+
