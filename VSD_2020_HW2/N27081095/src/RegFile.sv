@@ -1,7 +1,7 @@
 module RegFile(
 	// input clk, rst,
 	input rst,
-	input start,
+	// input start,
 	input RegWrite,
 	input [4:0] RS1,
 	input [4:0] RS2,

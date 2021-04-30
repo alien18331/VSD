@@ -33,7 +33,8 @@ logic lock_S0, lock_S1;
 
 logic slave_idx;
 
-assign B_done = (lock&&BREADY_M1&&(~BVALID_M1));
+// assign B_done = (lock&&BREADY_M1&&(~BVALID_M1));
+assign B_done = (BREADY_M1&&BVALID_M1);
 
 always_ff@(posedge clk) begin
 	if(rst)

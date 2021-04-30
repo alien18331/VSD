@@ -26,7 +26,7 @@ wire        wready_m0;    // Write ready
 
 // B Channel
 wire [3:0]	bid_m0;       // Write response ID tag
-wire [1:0]  bresp_m0;     // Write response
+wire [3:0]  bresp_m0;     // Write response
 wire        bvalid_m0;    // Write response valid
 wire        bready_m0;    // Write response ready
 
@@ -63,7 +63,7 @@ wire [3:0]  wstrb_m1;     // Write strobe
 wire        wlast_m1;     // Write last
 wire        wvalid_m1;    // Write valid
 wire        wready_m1;    // Write ready
-
+ 
 // B Channel
 wire [3:0]	bid_m1;       // Write response ID tag
 wire [3:0]  bresp_m1;     // Write response
@@ -452,7 +452,7 @@ SRAM_wrapper DM1(
 	.RRESP(rresp_s1),
 	.RLAST(rlast_s1),
 	.RVALID(rvalid_s1),
-	.RREADY(rready_s0)
+	.RREADY(rready_s1)
 );
 /*
 //IM

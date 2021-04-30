@@ -21,7 +21,7 @@ module CPU_wrapper(
 	input WREADY_M0,
 	//B_Channel
 	input [3:0] BID_M0,
-	input [1:0] BRESP_M0,
+	input [3:0] BRESP_M0,
 	input BVALID_M0,
 	output logic BREADY_M0,
 	//AR_Channel
@@ -57,7 +57,7 @@ module CPU_wrapper(
 	input WREADY_M1,
 	//B_Channel
 	input [3:0] BID_M1,
-	input [1:0] BRESP_M1,
+	input [3:0] BRESP_M1,
 	input BVALID_M1,
 	output logic BREADY_M1,
 	//AR_Channel
@@ -67,7 +67,7 @@ module CPU_wrapper(
 	output logic [2:0] ARSIZE_M1,
 	output logic [1:0] ARBURST_M1,
 	output logic ARVALID_M1,
-	output ARREADY_M1,
+	input ARREADY_M1,
 	//R_Channel
 	input [3:0] RID_M1,
 	input [31:0] RDATA_M1,
@@ -79,7 +79,10 @@ module CPU_wrapper(
 
 //IM
 logic [31:0] IM_A;
+logic IM_OE;
 logic [31:0] IM_DO;
+logic IM_Stall;
+logic IM_rDone;
 
 //DM
 logic DM_OE;
@@ -87,18 +90,27 @@ logic [3:0] DM_WEB;
 logic [31:0] DM_A;
 logic [31:0] DM_DI;
 logic [31:0] DM_DO;
+logic DM_Stall;
+logic DM_rDone;
 
 CPU i_CPU(.clk(clk),
 		  .rst(rst),
-		  .IM_Instr(IM_DO),
-		  .DM_RData(DM_DO),
-		  .IM_Adrs(IM_A),
-		  .DM_MemRead(DM_OE),
-		  .DM_MemWrite(DM_WEB),
-		  .DM_Adrs(DM_A),
-		  .DM_WData(DM_DI),
+		  //IM
+		  .IM_DO(IM_DO),
+		  .IM_OE(IM_OE),
+		  .IM_A(IM_A),
+		  //DM
+		  .DM_DO(DM_DO),		  
+		  .DM_OE(DM_OE),
+		  .DM_WEB(DM_WEB),
+		  .DM_A(DM_A),
+		  .DM_DI(DM_DI),
+		  //Stall
 		  .IM_Stall(IM_Stall),
-		  .DM_Stall(DM_Stall)
+		  .DM_Stall(DM_Stall),
+		  //rDone
+		  .IM_rDone(IM_rDone),
+		  .DM_rDone(DM_rDone)
 );
 
 
@@ -106,7 +118,7 @@ wrapper master0(.clk(clk),
 				.rst(rst),
 				//CPU
 				.CS(1'b1),
-				.OE(1'b1),
+				.OE(1'b1), //IM_OE
 				.WEB(4'b1111),
 				.A(IM_A),
 				.DI('b0),
@@ -146,7 +158,8 @@ wrapper master0(.clk(clk),
 				.RVALID(RVALID_M0),
 				.RREADY(RREADY_M0),
 				//other
-				.Stall(IM_Stall)
+				.Stall(IM_Stall),
+				.rDone(IM_rDone)
 );
 
 wrapper master1(.clk(clk),
@@ -193,7 +206,8 @@ wrapper master1(.clk(clk),
 				.RVALID(RVALID_M1),
 				.RREADY(RREADY_M1),
 				//other
-				.Stall(DM_Stall)
+				.Stall(DM_Stall),
+				.rDone(DM_rDone)
 );
 
 		

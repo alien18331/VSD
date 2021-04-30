@@ -19,7 +19,7 @@ module SRAM_wrapper (
 	output logic WREADY,
 	//B_Channel
 	output logic [7:0] BID,
-	output logic [1:0] BRESP,
+	output logic [3:0] BRESP,
 	output logic BVALID,	
 	input BREADY,
 
@@ -46,27 +46,100 @@ logic [13:0] A;
 logic [31:0] DI;
 logic [31:0] DO;
 
+logic AR_done;
+logic [31:0] tmp_AWADDR;
+logic [7:0] hold_ARID, hold_AWID;
+logic [31:0] tmp_DO;
+
 //SRAM
-assign OE 	= (ARVALID&&ARREADY) ? 1'b1 : 
-			  (RVALID&&RREADY) ? 1'b1 : 1'b0;
+// assign OE 	= (ARVALID&&ARREADY) ? 1'b1 :
+			  // (RVALID&&RREADY) ? 1'b1 : 1'b0;
 assign WEB 	= (WVALID&&WREADY) ? WSTRB : 4'b1111;
-assign A 	= (OE) ? ARADDR[15:2] : 
-		      (AWVALID) ? AWADDR[15:2] : 14'b0;		   
+// assign A 	= (OE) ? ARADDR[15:2] : 
+		      // (AWVALID) ? AWADDR[15:2] : 14'b0;
+// assign A 	= (!(&WEB)) ? AWADDR[15:2] : ARADDR[15:2];		  
 assign DI 	= (WVALID&&WREADY) ? WDATA : 32'b0;
 
-//R Channel
-assign RRESP = 2'b0;
-assign RLAST = OE ? 1'b1 : 1'b0;
+//OE
+always_ff@(posedge CK) begin
+	if(RST) OE <= 1'b0;
+	else if(ARVALID&&ARREADY)
+		OE <= 1'b1;
+	else if(RVALID&&RREADY)
+		OE <= 1'b0;	
+end
 
-//B Channel
-assign BRESP = 2'b0;
- 
-//lock_R
-logic lock_R;
+//A
 always_comb begin
-	if(RVALID&&(~RREADY)) 
-		lock_R <= 'b1;
-	else lock_R <= 'b0;
+	if(ARVALID&&ARREADY)
+		A = ARADDR[15:2];
+	else if((WVALID&&WREADY)||(AWVALID&&AWREADY))
+		A = tmp_AWADDR[15:2];
+	else
+		A = ARADDR[15:2];   //14'b0;
+end
+
+always_ff@(posedge CK)begin
+	if(RST)begin
+		tmp_AWADDR <= 32'b0;
+	end
+	else if(AWVALID&&AWREADY)begin
+		tmp_AWADDR <= AWADDR;
+	end
+	else if(BVALID&&BREADY)begin
+		tmp_AWADDR <= 32'b0;
+	end
+end
+
+//** B Channel **//
+assign BRESP = 4'b0;
+assign BID = hold_AWID;
+
+// ~ hold_AWID
+always_ff@(posedge CK) begin
+	if(RST) hold_AWID <= 8'b0;
+	else begin
+		if(AWVALID&&AWREADY) 
+			hold_AWID <= AWID;
+		else if(BVALID&&BREADY) 
+			hold_AWID <= 8'b0;
+	end
+
+end
+
+//** R Channel **//
+assign RRESP 	= 2'b0;
+assign RVALID 	= OE;
+assign RLAST 	= OE;
+
+// ~ RDATA/RID
+always_comb begin
+	if(RVALID) begin
+		if(AR_done) begin
+			RDATA 	= DO;	
+			RID 	= hold_ARID;
+		end
+	end
+	else begin
+		RDATA 	= 32'b0;	
+		RID 	= 8'b0;
+	end
+end
+
+// ~ AR_done/hold_ARID
+always_ff@(posedge CK) begin
+	if(RST) begin
+		AR_done <= 1'b0;
+		hold_ARID <= 8'b0;
+	end	
+	else if(ARVALID&&ARREADY) begin 
+		AR_done <= 1'b1;
+		hold_ARID <= ARID;
+	end
+	else begin
+		AR_done <= 1'b0;
+		hold_ARID <= 8'b0;
+	end
 end
 
 //AR_READY
@@ -99,62 +172,40 @@ end
 always_ff@(posedge CK) begin
 	if(RST)
 		WREADY <= 'b0;
-	else if(ARVALID&&ARREADY) 
-		WREADY <= 'b0;
+	// else if(ARVALID&&ARREADY) 
+		// WREADY <= 'b0;
 	else if(AWVALID&&AWREADY) 
+		WREADY <= 'b1;	
+	else if(WVALID&&WREADY) 
 		WREADY <= 'b0;	
-	else if(BVALID&&BREADY) 
-		WREADY <= 'b0;	
-	else
-		WREADY <= 'b1;
+	// else
+		// WREADY <= 'b1;
 end
 
-//R Channel
-always_ff@(posedge CK) begin
-	if(RST) begin
-		RVALID 	<= 'b0;
-		RID 	<= 'b0;
-		RDATA 	<= 'b0;
-	end
-	else if(lock_R) begin // Stable
-		RVALID 	<= RVALID;
-		RID 	<= RID;
-		RDATA 	<= RDATA;
-	end
-	else if(RVALID&&RREADY) begin // Read done
-		RVALID 	<= 'b0;
-		RID 	<= 'b0;
-		RDATA 	<= 'b0;
-	end
-	else if(AWVALID&&AWREADY) begin // Write case
-		RVALID 	<= 'b0;
-		RID 	<= 'b0;
-		RDATA 	<= 'b0;
-	end
-	else if(ARVALID&&ARREADY) begin // Update
-		RVALID 	<= OE;	
-		RID 	<= ARID;
-		RDATA 	<= DO;
-	end
-end
+
+
 
 //B Channel
 always_ff@(posedge CK) begin
 	if(RST) begin
-		BVALID 	<= 'b0;
-		BID 	<= 'b0;
+		BVALID 	<= 1'b0;
+		// hold_AWID <= 8'b0;
+		// BID 	<= 'b0;
 	end
 	else if(BVALID&&BREADY) begin // Response done
-		BVALID 	<= 'b0;	
-		BID 	<= 'b0;
+		BVALID 	<= 1'b0;
+		// hold_AWID <= 8'b0;		
+		// BID 	<= 'b0;
 	end
 	else if(AWVALID&&AWREADY) begin // Adrs write done, update ID
-		BVALID 	<= 'b0;	
-		BID 	<= AWID;
+		BVALID 	<= 1'b0;
+		// hold_AWID <= AWID;		
+		// BID 	<= AWID;
 	end
 	else if(WVALID&&WREADY) begin // write done, update valid
-		BVALID 	<= 'b1;	
-		BID 	<= BID;
+		BVALID 	<= 1'b1;	
+		// hold_AWID <= 8'b0;
+		// BID 	<= BID;
 	end
 end
 

@@ -25,7 +25,7 @@ module wrapper(
 	input WREADY,
 	//B_Channel
 	input [3:0] BID,
-	input [1:0] BRESP,
+	input [3:0] BRESP,
 	input BVALID,
 	output logic BREADY,
 
@@ -45,22 +45,24 @@ module wrapper(
 	input RVALID,
 	output logic RREADY,
 	//other
-	output logic Stall
+	output logic Stall,
+	output logic rDone
 );
 
 enum logic [1:0] {_RIDLE,_AR_CH,_R_CH}rcs,rns;
 enum logic [1:0] {_WIDLE,_AW_CH,_W_CH,_B_CH}wcs,wns;
 
+assign rDone = RVALID&&RREADY&&rcs==_R_CH;
+
 //Stall
 always_comb begin
 	if(OE)
-		Stall <= (RREADY) ? 1'b0 : 1'b1;
+		Stall <= (RVALID) ? 1'b0 : 1'b1;
 	else if(!(&WEB))
 		Stall <= (WREADY && wcs==_W_CH) ? 1'b0 : 1'b1;
 	else
 		Stall <= 1'b0;
 end
-
 
 //Write
 always_ff@(posedge clk) begin
@@ -70,7 +72,7 @@ end
 
 always_comb begin
 	case(wcs)
-		_WIDLE: 	wns = _AW_CH;
+		_WIDLE: wns = _AW_CH;
 		_AW_CH: wns = (AWVALID&&AWREADY) ? _W_CH : _AW_CH;
 		_W_CH: 	wns = (WVALID&&WREADY) ? _B_CH : _W_CH;
 		_B_CH: 	wns = (BVALID&&BREADY) ? _AW_CH : _B_CH;
@@ -81,7 +83,7 @@ logic lock_aw;
 always_ff@(posedge clk) begin
 	if(rst) lock_aw <= 'b0;
 	else begin
-		if(AWVALID&&(~AWREADY)) 
+		if(AWVALID&&!AWREADY) 
 			lock_aw <= 'b1;
 		else lock_aw <= 'b0;
 	end
@@ -134,7 +136,7 @@ always_comb begin
 		_W_CH: begin
 			//AW Channel
 			AWID 	= 'b0;
-			AWADDR 	= 'b0;
+			AWADDR 	= AWADDR;
 			AWLEN 	= 'b0;
 			AWSIZE 	= 'b0;
 			AWBURST = 'b0;
@@ -224,7 +226,7 @@ always_comb begin
 		end
 		_AR_CH: begin
 			//CPU
-			DO 		<= 'b0;
+			DO 		<= DO;
 			//AR Channel
 			ARID 	<= 'b0;
 			ARADDR 	<= (lock_ar) ? ARADDR : A;

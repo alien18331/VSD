@@ -6,20 +6,24 @@ module CPU(
 	input clk, 
 	input rst,	
 	//IM
-	input [31:0] IM_Instr,
+	input [31:0] IM_DO,
 	//DM
-	input [31:0] DM_RData,
+	input [31:0] DM_DO,
 	//**** output ****
 	//IM
-	output logic [31:0] IM_Adrs,
+	output logic IM_OE,
+	output logic [31:0] IM_A,
 	//DM
-	output logic DM_MemRead,
-	output logic [3:0] DM_MemWrite,
-	output logic [31:0] DM_Adrs,
-	output logic [31:0] DM_WData,
+	output logic DM_OE,
+	output logic [3:0] DM_WEB,
+	output logic [31:0] DM_A,
+	output logic [31:0] DM_DI,
 	//stall
 	input IM_Stall,
-	input DM_Stall
+	input DM_Stall,
+	//rDone
+	input IM_rDone,
+	input DM_rDone
 );
 
 //ControlUnit
@@ -34,6 +38,7 @@ logic ctl_JalrSel;
 logic [1:0] ctl_RWSel;
 
 //DataPath
+logic dp_IM_OE;
 logic [31:0] dp_IM_Adrs;
 logic [6:0] dp_OpCode_ctl;
 logic [2:0] dp_Func3_ctl;
@@ -49,19 +54,19 @@ logic [31:0] dp_DM_WData;
 logic [3:0] aluctl_ALUOperation;
 
 // To IM
-assign IM_Adrs = dp_IM_Adrs;
+assign IM_A = dp_IM_Adrs;
+assign IM_OE = dp_IM_OE;
 
 // To DM
-assign DM_MemRead = dp_DM_MemRead;
-assign DM_MemWrite = dp_DM_MemWrite;
-assign DM_Adrs = dp_DM_Adrs;
-assign DM_WData = dp_DM_WData;
+assign DM_OE = dp_DM_MemRead;
+assign DM_WEB = dp_DM_MemWrite;
+assign DM_A = dp_DM_Adrs;
+assign DM_DI = dp_DM_WData;
 
-			   
 DataPath DP(.clk(clk),
 			 .rst(rst),
 			 //IM
-			 .Instr(IM_Instr),
+			 .Instr(IM_DO),
 			 //ControlUnit
 			 .ALUSrc(ctl_ALUSrc),
 			 .MemToReg(ctl_MemToReg),
@@ -75,9 +80,10 @@ DataPath DP(.clk(clk),
 			 //ALUControlUnit
 			 .ALUOperation(aluctl_ALUOperation),
 			 //DM
-			 .DM_RData(DM_RData),
+			 .DM_RData(DM_DO),
 			 //****output****
 			 //IM
+			 .IM_OE(dp_IM_OE),
 			 .IM_Adrs(dp_IM_Adrs),
 			 //ControlUnit
 			 .tmp_OpCode_A(dp_OpCode_ctl),
@@ -93,7 +99,10 @@ DataPath DP(.clk(clk),
 			 .DM_WData(dp_DM_WData),
 			 //stall
 			 .IM_Stall(IM_Stall),
-			 .DM_Stall(DM_Stall) );
+			 .DM_Stall(DM_Stall),
+			 //rDone
+			 .IM_rDone(IM_rDone),
+			 .DM_rDone(DM_rDone) );
 			 
 
 ControlUnit ControlUnit(.OpCode(dp_OpCode_ctl),
