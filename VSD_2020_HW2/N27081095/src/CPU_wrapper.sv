@@ -118,7 +118,7 @@ wrapper master0(.clk(clk),
 				.rst(rst),
 				//CPU
 				.CS(1'b1),
-				.OE(1'b1), //IM_OE
+				.OE(IM_OE), //IM_OE
 				.WEB(4'b1111),
 				.A(IM_A),
 				.DI('b0),

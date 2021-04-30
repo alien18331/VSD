@@ -1,3 +1,16 @@
+/*   
+1. must have DM_rdone
+2. IM_Stall & DM_Stall should be posedge at same time
+3. regfile not necessarily be a flipflop
+4. confition IM_Stall||DM_Stall should be stable pipeline register
+5. PC update shoube be at !IM_Stall&&!DM_Stall
+6. Reg_A and Reg_B shoube be empty when Stall on
+7. Reg_B shoube be empty when PCSel on
+8. Reg_C and Reg_D shoube consider the DM_rDone signal
+9. Reg_C Mem_WData shoube reset when DM_rDone
+10. 
+*/
+
 `include "add4.sv"
 `include "ALU.sv"
 `include "mux2.sv"
@@ -10,7 +23,6 @@
 `include "RegFile.sv"
 `include "RegPack.sv"
 `include "DataType.sv"
-
 
 import RegPack::*; 
  
@@ -110,8 +122,7 @@ always_ff@(posedge clk) begin
 		else IM_OE <= 1'b1;
 	end
 end
-				 
-				 
+
 add4 PC_Add4(.D(CurPC),
 			 .Q(PCPlus4) );
 
